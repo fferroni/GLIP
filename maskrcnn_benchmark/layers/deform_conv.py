@@ -173,8 +173,6 @@ class ModulatedDeformConvFunction(Function):
         ctx.with_bias = bias is not None
         if not ctx.with_bias:
             bias = input.new_empty(1)  # fake tensor
-        if not input.is_cuda:
-            raise NotImplementedError
         if weight.requires_grad or mask.requires_grad or offset.requires_grad \
                 or input.requires_grad:
             ctx.save_for_backward(input, offset, mask, weight, bias)
@@ -207,8 +205,6 @@ class ModulatedDeformConvFunction(Function):
     @staticmethod
     @once_differentiable
     def backward(ctx, grad_output):
-        if not grad_output.is_cuda:
-            raise NotImplementedError
         input, offset, mask, weight, bias = ctx.saved_tensors
         grad_input = torch.zeros_like(input)
         grad_offset = torch.zeros_like(offset)

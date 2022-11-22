@@ -53,18 +53,23 @@ def boxlist_ml_nms(boxlist, nms_thresh, max_proposals=-1,
     scores = boxlist.get_field(score_field)
     labels = boxlist.get_field(label_field)
 
-    if boxes.device==torch.device("cpu"):
+    if boxes.device == torch.device("cpu"):
         keep = []
         unique_labels = torch.unique(labels)
-        print(unique_labels)
         for j in unique_labels:
             inds = (labels == j).nonzero().view(-1)
-
             scores_j = scores[inds]
             boxes_j = boxes[inds, :].view(-1, 4)
             keep_j = _box_nms(boxes_j, scores_j, nms_thresh)
+            keep.extend(keep_j)
+        keep = torch.stack(keep)
 
-            keep += keep_j
+        # This yields different answers
+        # keep = _box_ml_nms(
+        #   boxes.to("cuda"),
+        #   scores.to("cuda"),
+        #   labels.float().to("cuda"),
+        #   nms_thresh).to("cpu")
     else:
         keep = _box_ml_nms(boxes, scores, labels.float(), nms_thresh)
         
