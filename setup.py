@@ -25,7 +25,7 @@ def get_extensions():
     sources = main_file + source_cpu
     extension = CppExtension
 
-    extra_compile_args = {"cxx": ["-fopenmp"]}
+    extra_compile_args = {"cxx": ["-fopenmp", "-O3", "-ffast-math"]}
     extra_link_args = ["-lgomp"]
     define_macros = []
 
