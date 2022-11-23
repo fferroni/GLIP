@@ -262,8 +262,11 @@ class GeneralizedVLRCNN(nn.Module):
 
         # rpn force boxes
         if targets:
-            targets = [target.to(device)
-                       for target in targets if target is not None]
+            tmp = []
+            for target in targets:
+                if target is not None:
+                    tmp.append(target)
+            targets = tmp
 
         if self.force_boxes:
             proposals = []
@@ -279,7 +282,7 @@ class GeneralizedVLRCNN(nn.Module):
                 null_loss = 0
                 for key, param in self.rpn.named_parameters():
                     null_loss += 0.0 * param.sum()
-                proposal_losses = {('rpn_null_loss', null_loss)}
+                proposal_losses = {'rpn_null_loss': null_loss}
         else:
             proposals, proposal_losses, fused_visual_features = self.rpn(images, visual_features, targets, language_dict_features, positive_map,
                                               captions, swint_feature_c4)

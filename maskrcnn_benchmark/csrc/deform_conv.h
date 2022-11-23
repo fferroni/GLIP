@@ -134,12 +134,16 @@ void modulated_deform_conv_forward(
     const bool with_bias)
 {
   if (input.device().is_cuda()) {
+#ifdef WITH_CUDA
     return modulated_deform_conv_cuda_forward(
         input, weight, bias, ones, offset, mask, output, columns,
         kernel_h, kernel_w, stride_h, stride_w, 
         pad_h, pad_w, dilation_h, dilation_w,
         group, deformable_group, with_bias
     );
+#else
+    AT_ERROR("Not compiled with GPU support");
+#endif
   }
   else {
     return modulated_deform_conv_cpu_forward(
@@ -179,12 +183,16 @@ void modulated_deform_conv_backward(
     const bool with_bias)
 {
   if (input.device().is_cuda()) {
+#ifdef WITH_CUDA
     return modulated_deform_conv_cuda_backward(
         input, weight, bias, ones, offset, mask, columns, 
         grad_input, grad_weight, grad_bias, grad_offset, grad_mask, grad_output,
         kernel_h, kernel_w, stride_h, stride_w, pad_h, pad_w, dilation_h, dilation_w,
         group, deformable_group, with_bias
     );
+#else
+    AT_ERROR("Not compiled with GPU support");
+#endif
   }
   else {
     return modulated_deform_conv_cpu_backward(
