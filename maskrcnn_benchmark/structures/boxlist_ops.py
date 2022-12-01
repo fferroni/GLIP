@@ -3,7 +3,7 @@ import torch
 
 from .bounding_box import BoxList
 
-from maskrcnn_benchmark.layers import nms as _box_nms
+from torchvision.ops import nms as _box_nms
 from maskrcnn_benchmark.layers import ml_nms as _box_ml_nms
 
 
@@ -54,22 +54,7 @@ def boxlist_ml_nms(boxlist, nms_thresh, max_proposals=-1,
     labels = boxlist.get_field(label_field)
 
     if boxes.device == torch.device("cpu"):
-        keep = []
-        unique_labels = torch.unique(labels)
-        for j in unique_labels:
-            inds = (labels == j).nonzero().view(-1)
-            scores_j = scores[inds]
-            boxes_j = boxes[inds, :].view(-1, 4)
-            keep_j = _box_nms(boxes_j, scores_j, nms_thresh)
-            keep.extend(keep_j)
-        keep = torch.stack(keep)
-
-        # This yields different answers
-        # keep = _box_ml_nms(
-        #   boxes.to("cuda"),
-        #   scores.to("cuda"),
-        #   labels.float().to("cuda"),
-        #   nms_thresh).to("cpu")
+        keep = _box_nms(boxes, scores, nms_thresh)
     else:
         keep = _box_ml_nms(boxes, scores, labels.float(), nms_thresh)
         
