@@ -58,6 +58,7 @@ def get_extensions():
 
 setup(
     name="maskrcnn_benchmark",
+    install_requires=["torch", "torchvision"],
     description="object detection in pytorch",
     packages=find_packages(exclude=("configs", "tests",)),
     ext_modules=get_extensions(),
